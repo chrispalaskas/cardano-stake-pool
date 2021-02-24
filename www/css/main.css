@@ -1,0 +1,97 @@
+h1 {
+  font-family: 'Arial';
+  text-align: center;
+  color: #2a14a8;
+}
+
+h2 {
+  font-family: 'Arial';
+  text-align: center;
+  color: #2a14a8;
+}
+
+h3 {
+  font-family: 'Crimson Pro', serif;
+  font-size: 40px;
+}
+
+.s1 {
+  background: url("../images/thinker4.jpg");
+  background-size: cover;
+}
+
+.s1 h1 {
+  margin-left: 35em;
+  color: #555558;
+}
+
+.s1 h2 {
+  margin-left: 58em;
+  margin-right: 7em;
+  text-align: justify;
+  color: #555558;
+}
+
+.s1 h3 {
+  text-align: left;
+  margin-top: -20em;
+  margin-left: 4em;
+  color: #555558;
+}
+
+.s1 span {
+  background: white;
+}
+
+.s2 {
+  background: url("../images/thinker5.jpg");
+  background-size: cover;
+}
+
+.s2 h1 {
+  margin-left: 35em;
+  color: #555558;
+}
+
+.s2 h2 {
+  margin-left: 58em;
+  margin-right: 7em;
+  text-align: justify;
+  color: #555558;
+}
+
+.s2 h3 {
+  text-align: left;
+  margin-top: -20em;
+  margin-left: 4em;
+  color: #555558;
+}
+
+.s2 span {
+  background: white;
+}
+
+.s3 {
+  background: url("../images/thinker6.jpg");
+  background-size: cover;
+}
+
+.s3 h1 {
+  margin-left: 35em;
+  color: #555558;
+}
+
+.s3 h2 {
+  margin-left: 58em;
+  margin-right: 7em;
+  text-align: justify;
+  color: #555558;
+}
+
+.s3 h3 {
+  text-align: left;
+  margin-top: -20em;
+  margin-left: 4em;
+  color: #555558;
+}
+/*# sourceMappingURL=main.css.map */
