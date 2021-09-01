@@ -1,0 +1,69 @@
+
+Transfer rewards:
+_____________________________________________________________________________
+ON PASSIVE NODE PREFERABLY:
+_____________________________________________________________________________
+
+On the terminal you will perform the operation:
+export CARDANO_NODE_SOCKET_PATH=/opt/cardano/cnode/sockets/node0.socket
+
+Get the balance of payment address:
+cardano-cli query utxo \
+--address $(cat payment.addr) \
+--mainnet
+
+16471234
+
+Check stake address balance:
+cardano-cli query stake-address-info \
+            --cardano-mode \
+            --address $(cat stake.addr) \
+            --mainnet
+
+1407729293
+
+cardano-cli transaction build-raw \
+--tx-in xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#1 \
+--tx-out $(cat payment.addr)+0 \
+--withdrawal $(cat stake.addr)+1407729293 \
+--invalid-hereafter 0 \
+--fee 0 \
+--out-file withdraw_rewards.raw
+
+cardano-cli query protocol-parameters \
+  --mainnet \
+  --out-file protocol.json
+  
+cardano-cli transaction calculate-min-fee \
+--tx-body-file withdraw_rewards.raw  \
+--tx-in-count 1 \
+--tx-out-count 1 \
+--witness-count 1 \
+--byron-witness-count 0 \
+--protocol-params-file protocol.json
+
+// expr (payment address balance) - (transaction fees) + (rewards)
+expr 105140821 - 180000 + 1407729293
+1512690114
+Get TTL:
+cardano-cli query tip --mainnet
+
+fee 180000
+"slot": 38880514,
+
+cardano-cli transaction build-raw \
+--tx-in xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#1 \
+--tx-out $(cat payment.addr)+1512690114 \
+--withdrawal $(cat stake.addr)+1407729293 \
+--invalid-hereafter 38883514 \
+--fee 180000 \
+--mary-era \
+--out-file withdraw_rewards.raw    
+
+cardano-cli transaction sign \
+--tx-body-file withdraw_rewards.raw  \
+--signing-key-file /media/christo/TOSHIBA/kryakleis/payment.skey \
+--signing-key-file /media/christo/TOSHIBA/kryakleis/stake.skey \
+--out-file withdraw_rewards.signed
+
+cardano-cli transaction submit --tx-file withdraw_rewards.signed --mainnet

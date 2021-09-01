@@ -1,0 +1,10 @@
+On the client, create a public/private key pair (e.g. your local desktop):
+ssh-keygen -m PEM -t rsa -b 4096
+
+Create passphrase
+
+Send the public key to the server (e.g. a VM on the cloud):
+ssh-copy-id -i ~/.ssh/id_rsa.pub username@myserver.IP
+
+From the client you just need:
+ssh username@myserver.IP

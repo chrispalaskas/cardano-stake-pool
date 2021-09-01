@@ -1,0 +1,5 @@
+xxxxxxx@xxxxxxx-bp:~$ curl localhost:12798/metrics | grep “cardano_node_metrics_slotsMissedNum_int”
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  2054    0  2054    0     0   668k      0 --:--:-- --:--:-- --:--:--  668k
+xxxxxxx@xxxxxxx-bp:~$ 

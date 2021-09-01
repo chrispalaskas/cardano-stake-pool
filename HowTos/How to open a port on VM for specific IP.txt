@@ -1,0 +1,8 @@
+To allow connection from another machine:
+
+Open firewall:
+sudo ufw allow from xx.xx.xxx.xxx to any port xxxx
+
+Open the port to specific IPs from azure portal:
+Source IP, any port and Destination Any, port xxxx
+

@@ -1,0 +1,21 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+sudo apt-get autoremove
+
+https://ubuntu.com/blog/how-to-upgrade-from-ubuntu-18-04-lts-to-20-04-lts-today
+
+Open port 1022 on Azure
+
+There are broken packages:
+https://askubuntu.com/questions/360293/could-not-calculate-the-upgrade-what-happened
+
+
+Remove python-minimal:
+sudo apt-get remove python-minimal --purge
+
+sudo do-release-upgrade -d
+
+
+
+

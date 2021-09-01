@@ -1,0 +1,25 @@
+Create split screen:
+screen
+Ctrl A + Shift |
+Creates new split
+Ctrl A + Tab
+switches between splits
+Ctrl A + Ctrl C
+Creates new terminal in split
+exit kills split
+
+
+To preseve the session add this line to your ~/.screenrc:
+# This line makes Detach and Re-attach without losing the regions/windows layout
+layout save default
+
+To enable scrollbar in screen session add this line to your ~/.screenrc:
+# Enable mouse scrolling and scroll bar history scrolling
+termcapinfo xterm* ti@:te@
+
+To reattach to a previous screen session:
+screen -r
+
+To remove a split without killing the bash:
+Ctrl A + Shift q
+

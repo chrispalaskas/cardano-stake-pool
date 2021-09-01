@@ -1,0 +1,34 @@
+Old stuff
+=======================================================================================================
+cardano-cli query ledger-state --mary-era --mainnet > ledger-state-228.json
+
+cncli leaderlog --pool-id xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+--pool-vrf-skey vrf.skey \
+--byron-genesis ~/configMainnet/mainnet-byron-genesis.json \
+--shelley-genesis ~/configMainnet/mainnet-shelley-genesis.json \
+--ledger-state ledger-state-227.json \
+--ledger-set current
+
+cncli leaderlog --pool-id xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+--pool-vrf-skey /home/xxxxx/Desktop/leaderlogs/vrf.skey \
+--byron-genesis ~/configMainnet/mainnet-byron-genesis.json \
+--shelley-genesis ~/configMainnet/mainnet-shelley-genesis.json \
+--db /opt/cardano/cnode/guild-db/cncli/cncli.db \
+--ledger-set current
+
+
+cncli status \
+--byron-genesis ~/configMainnet/mainnet-byron-genesis.json \
+--shelley-genesis ~/configMainnet/mainnet-shelley-genesis.json \
+--db /opt/cardano/cnode/guild-db/cncli/cncli.db 
+
+
+cardano-cli shelley system stop
+=======================================================================================================
+New Stuff
+=======================================================================================================
+https://explorer.cardano.org/en Get latest tip first
+/opt/cardano/cnode/scripts/cncli.sh leaderlog
+
+/opt/cardano/cnode/scripts/cntools.sh
+[B]lock or [s]ummary

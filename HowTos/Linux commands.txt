@@ -1,0 +1,99 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+sudo apt-get autoremove
+
+Install fail2ban:
+sudo apt-get install fail2ban
+sudo touch /etc/fail2ban/jail.local
+Add this to jail.local:
+[sshd]
+enabled = true
+port = xxxx
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 60m
+findtime = 10m
+
+Create SSH Certificate:
+ssh-keygen -m PEM -t rsa -b 4096
+
+Send public key to remote VM:
+cat ~/.ssh/bluepill.pub | ssh xxxxxxx@xx.xx.xx.xxx -p xxxx 'cat >> .ssh/authorized_keys' (core)
+cat ~/.ssh/bluepill.pub | ssh xxxxxxx@yy.yy.yy.yyy -p xxxx 'cat >> .ssh/authorized_keys' (rl2)
+cat ~/.ssh/bluepill.pub | ssh xxxxxxx@zz.zz.zz.zzz -p xxxx 'cat >> .ssh/authorized_keys' (rl3)
+
+Remove password access from SSH. Allows only with certificate. Also change port:
+Edit the /etc/ssh/sshd_config
+Change passwordAuthentication to No
+Change Port to something beyond 22
+ssh xxxxxxx@xx.xx.xx.xxx -p xxxx
+
+Find open ports:
+sudo netstat -tulpn | grep LISTEN
+
+or with netcat:
+nc -z -v xx.xx.xx.xxx xxxx
+
+Check network speed:
+sudo apt install speedtest-cli
+speedtest
+
+Login using a password:
+ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -p xxxx xxxxx@xx.xx.xx.xxx
+
+Run an app as a service:
+/usr/local/bin/startupCardanoRelay.sh or startupCardanoCore (chmod 731)
+
+/etc/systemd/system/name.service (664)
+
+Show all services: 
+systemctl list-units --type=service
+
+To check for attacks:
+/var/log/auth.log 
+/var/log/fail2ban.log
+
+Move files around:
+scp -P xxxx /home/xxxxxxx/.local/bin/ xxxxxxx@xx.xx.xx.xxx:/home/xxxxxxx/keys2
+
+Get size of directory:
+du -hs <dir>
+
+Enable scrolling on terminal:
+~/.screenrc: (Create this file if necessary)
+# This line makes Detach and Re-attach without losing the regions/windows layout
+layout save default
+
+# Enable mouse scrolling and scroll bar history scrolling
+termcapinfo xterm* ti@:te@
+
+less .bash_history
+
+# Get the full output from a service:
+journalctl -f -u cnode
+
+#Increase HD space
+Increase Disk size with Virtual Box settings
+Add gparted ISO and boot with that.
+Delete swap
+Increase sda size, leave 2048MB
+Add linux-swap
+
+
+# Swap memory change of partition ID
+This Swap ID:
+sudo blkid |grep swap
+Has to go in this file:
+sudo nano /etc/fstab 
+
+
+# Which files are currently written to HD
+lsof | grep -e "[[:digit:]]\+w"
+
+# Find a file in HD
+sudo find / -type f -iname "filename"
+
+# Search a folder for a string
+grep -r blah .

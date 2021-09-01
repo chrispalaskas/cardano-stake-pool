@@ -1,0 +1,30 @@
+### Pledge from Daedalus Wallet ###
+
+### Extract root keys and create Payment and Stake Addresses using cardano-address tool ###
+
+echo "your wallet 24 words" > phrase.prv
+cat phrase.prv | cardano-address key from-recovery-phrase Shelley > rootkey.prv
+
+cat rootkey.prv | cardano-address key public --with-chain-code > rootkey.pub
+cat rootkey.prv | cardano-address key child 1852H/1815H/0H/0/0 > addr.prv
+cat addr.prv | cardano-address key public --with-chain-code | cardano-address address payment --network-tag mainnet > payment.addr
+cat rootkey.prv | cardano-address key child 1852H/1815H/0H/2/0 > stake.prv
+cat stake.prv | cardano-address key public --with-chain-code | cardano-address address stake --network-tag mainnet > stake.addr
+
+
+### Create Payment and Stake vkey/skey files using cardano-cli ###
+
+cardano-cli key convert-cardano-address-key --signing-key-file stake.prv --shelley-stake-key --out-file ShelleyStake.skey
+cardano-cli key convert-cardano-address-key --signing-key-file addr.prv --shelley-payment-key --out-file ShelleyPayment.skey
+
+cardano-cli key verification-key --signing-key-file ShelleyStake.skey --verification-key-file Ext_ShelleyStake.vkey
+cardano-cli key verification-key --signing-key-file ShelleyPayment.skey --verification-key-file Ext_ShelleyPayment.vkey
+
+cardano-cli key non-extended-key --extended-verification-key-file Ext_ShelleyStake.vkey --verification-key-file ShelleyStake.vkey
+cardano-cli key non-extended-key --extended-verification-key-file Ext_ShelleyPayment.vkey --verification-key-file ShelleyPayment.vkey
+
+cardano-cli stake-address build --stake-verification-key-file ShelleyStake.vkey --out-file ShelleyStake.addr --mainnet
+cardano-cli address build --payment-verification-key-file ShelleyPayment.vkey  --stake-verification-key-file ShelleyStake.vkey --out-file ShelleyPayment.addr --mainnet
+
+
+### Repledge the pool with new keys. ###

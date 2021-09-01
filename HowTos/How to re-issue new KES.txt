@@ -1,0 +1,33 @@
+# Generate new KES keys in the ~/keys folder:
+cardano-cli node key-gen-KES \
+--verification-key-file kes.vkey \
+--signing-key-file kes.skey
+
+# Get slotsPerKESPeriod:
+cat mainnet-shelley-genesis.json | grep KESPeriod
+    "slotsPerKESPeriod": 129600,
+
+# Get Current Tip of blockchain slotNo:
+cardano-cli query tip --mainnet | grep slot
+    "slot": 31423062,
+
+# Calculate KES period:
+expr 31423062 / 129600
+242
+
+# Generate the node certificate:
+cardano-cli node issue-op-cert \
+--kes-verification-key-file kes.vkey \
+--cold-signing-key-file /media/christo/TOSHIBA/kryakleis/cold.skey \
+--operational-certificate-issue-counter /media/christo/TOSHIBA/kryakleis/cold.counter \
+--kes-period 242 \
+--out-file node.cert
+
+# Move kes.vkey, skey and node.cert to the USB stick:
+# From the local VM send to BP kes.skey and node.cert:
+scp -P 3223 ./kes.skey xxxxxxx@xx.xx.xx.xx:/home/xxxxxxx/keys/kes.skey
+scp -P 3223 ./node.cert xxxxxxx@xx.xx.xx.xx:/home/xxxxxxx/keys/node.cert
+
+
+Reboot the BP node 
+Or restart the service

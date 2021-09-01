@@ -1,0 +1,28 @@
+First unencrypt the vdi file.
+
+cd C:\Program Files\Oracle\VirtualBox
+
+From Fixed to Dynamic:
+
+VBoxManage.exe clonemedium disk "C:\Users\chris\VirtualBox VMs\LinuxakiEnc\Linuxaki20enc.vdi" "C:\Users\chris\VirtualBox VMs\LinuxakiEnc\Linuxaki20encdyn.vdi" –variant Standard
+
+https://www.howtogeek.com/312456/how-to-convert-between-fixed-and-dynamic-disks-in-virtualbox/
+
+Load GParted as boot image
+Don't touch keymap, continue to start X
+Extend the primary to the unallocated partition, add linux-swap 2GB
+
+
+To make the newly created partition faster:
+cd /etc/initramfs-tools/conf.d
+sudo touch resume
+sudo nano resume
+Add this in the file: RESUME=none
+
+sudo update-initramfs -u
+
+sudo reboot
+
+sudo blkid
+Take the swap UUID and place it in file /etc/fstab 
+so that it doesn't search for a string UUID that it will never find.

@@ -1,0 +1,73 @@
+pool metadata json hash:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+cardano-cli stake-pool metadata-hash --pool-metadata-file pool_metadata.json
+
+
+cardano-cli stake-pool registration-certificate \
+--cold-verification-key-file /media/christo/TOSHIBA/kryakleis/cold.vkey \
+--vrf-verification-key-file /media/christo/TOSHIBA/kryakleis/vrf.vkey \
+--pool-pledge 10000000000 \
+--pool-cost 340000000 \
+--pool-margin 0 \
+--pool-reward-account-verification-key-file /media/christo/TOSHIBA/kryakleis/stake.vkey \
+--pool-owner-stake-verification-key-file /media/christo/TOSHIBA/kryakleis/stake.vkey \
+--mainnet \
+--pool-relay-ipv4 xx.xx.xx.xx \
+--pool-relay-port xxxx \
+--pool-relay-ipv4 yy.yy.yy.yy \
+--pool-relay-port yyyy \
+--metadata-url https://www.xxxxxxxxxxx.com/json/pool_metadata.json \
+--metadata-hash xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+--out-file pool-registration.cert
+
+cardano-cli stake-address delegation-certificate \
+--stake-verification-key-file /media/christo/TOSHIBA/kryakleis/stake.vkey \
+--cold-verification-key-file /media/christo/TOSHIBA/kryakleis/cold.vkey \
+--out-file delegation.cert
+
+cardano-cli transaction build-raw \
+--tx-in xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#0 \
+--tx-out addr1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx+0 \
+--invalid-hereafter 0 \
+--fee 0 \
+--out-file tx.draft \
+--certificate-file pool-registration.cert \
+--certificate-file delegation.cert
+
+
+cardano-cli query utxo \
+--address addr1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+--mainnet \
+--mary-era
+
+cardano-cli query tip --mainnet
+
+
+cardano-cli transaction build-raw \
+--tx-in addr1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#0 \
+--tx-out addr1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx+16471234 \
+--invalid-hereafter 25205000 \
+--fee 200000 \
+--out-file tx.raw \
+--certificate-file pool-registration.cert \
+--certificate-file delegation.cert
+
+cardano-cli transaction sign \
+--tx-body-file tx.raw \
+--signing-key-file /media/christo/TOSHIBA/kryakleis/payment.skey \
+--signing-key-file /media/christo/TOSHIBA/kryakleis/stake.skey \
+--signing-key-file /media/christo/TOSHIBA/kryakleis/cold.skey \
+--mainnet \
+--out-file tx.signed
+
+
+
+***** REMOVE USB STICK ******
+
+cardano-cli transaction submit \
+--tx-file tx.signed \
+--mainnet
+
+
+poolID: zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+cardano-cli query ledger-state --mainnet | grep publicKey | grep zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
