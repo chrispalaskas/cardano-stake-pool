@@ -3,19 +3,6 @@ sudo apt-get upgrade
 sudo apt-get dist-upgrade
 sudo apt-get autoremove
 
-Install fail2ban:
-sudo apt-get install fail2ban
-sudo touch /etc/fail2ban/jail.local
-Add this to jail.local:
-[sshd]
-enabled = true
-port = xxxx
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 3
-bantime = 60m
-findtime = 10m
-
 Create SSH Certificate:
 ssh-keygen -m PEM -t rsa -b 4096
 
@@ -50,10 +37,6 @@ Run an app as a service:
 
 Show all services: 
 systemctl list-units --type=service
-
-To check for attacks:
-/var/log/auth.log 
-/var/log/fail2ban.log
 
 Move files around:
 scp -P xxxx /home/xxxxxxx/.local/bin/ xxxxxxx@xx.xx.xx.xxx:/home/xxxxxxx/keys2
