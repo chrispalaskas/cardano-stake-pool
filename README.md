@@ -1,7 +1,7 @@
 # cardano-stake-pool
 The source code to the website, using fullPage.js.
 
-Some auxiliary scripts for running a cardano staking pool node.
+Some how tos, helpful for running a cardano staking pool node.
 
 The script sendADA.py has some public variables that need to be set in order to work.
 
