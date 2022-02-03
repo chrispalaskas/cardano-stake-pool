@@ -14,20 +14,21 @@ from datetime import datetime
 
 # Global variables
 url = 'https://cardano-mainnet.blockfrost.io/api/v0/'
-blockFrostProjID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-myPaymentAddrFile = 'PATH_TO/payment.addr'
-myPaymentAddrSignKeyFile = 'PATH_TO/payment.skey'
-tokenPolicyID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxx'      
+blockFrostProjID = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+myPaymentAddrFile = '/home/christo/Desktop/cnode/priv/wallet/SkepsisCoinWallet/payment.addr'
+myPaymentAddrSignKeyFile = '/home/christo/Desktop/cnode/priv/wallet/SkepsisCoinWallet/payment.skey'
+tokenPolicyID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxx'      
 noOfTokensToSend = 1
 minADAToSendWithToken = 1444443
 
 stakeAddressesOfRecipients = \
     [
-        "stake1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxx",
-        "stake2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxx",
-        "stake3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxx",
-        "stake4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxx",
-        "stake5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxx"        
+        'stake1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        'stake1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        'stake1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        'stake1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        'stake1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        'stake1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
      ]
 
 
@@ -62,10 +63,11 @@ def getAddrUTxOs(addr):
 
 
 def getTxHashWithToken(utxosJson, policyID):
-    print (utxosJson)
     txHashWithToken = ''
     initLovelace = -1
     initToken = -1
+    sumLovelace = 0
+    sumToken = 0
     for key in utxosJson.keys():
         address = utxosJson[key]['address']
         tokensDict = {}
@@ -73,13 +75,18 @@ def getTxHashWithToken(utxosJson, policyID):
             if key2 == 'lovelace':
                 tokensDict['ADA'] = utxosJson[key]['value'][key2] / 1000000
                 initLovelace = utxosJson[key]['value'][key2]
+                sumLovelace += initLovelace
             else:
                 for key3 in utxosJson[key]['value'][key2].keys():
                     tokensDict[key2+'.'+key3] = utxosJson[key]['value'][key2][key3]
                     if key2+'.'+key3 == tokenPolicyID:
                         txHashWithToken = key
                         initToken = utxosJson[key]['value'][key2][key3]
-    return txHashWithToken, initLovelace, initToken
+                        sumToken += initToken
+    if len(utxosJson.keys()) > 1:
+        return '', sumLovelace, sumToken, utxosJson.keys()
+    else:
+        return txHashWithToken, initLovelace, initToken, utxosJson.keys()
 
 
 def getProtocolJson():
@@ -98,25 +105,27 @@ def getCurrentSlot():
     return getCardanoCliValue(command, 'slot')
 
 
-def getMinFee(txOutCnt):
+def getMinFee(txInCnt, txOutCnt):
     print('Getting min fee for transaction...')
+    txOutCnt += 1
     command = f'cardano-cli transaction calculate-min-fee \
                                 --tx-body-file tx.tmp \
-                                --tx-in-count 1 \
+                                --tx-in-count {txInCnt} \
                                 --tx-out-count {txOutCnt} \
                                 --mainnet \
-                                --witness-count 1 \
+                                --witness-count 2 \
                                 --byron-witness-count 0 \
                                 --protocol-params-file protocol.json'
     feeString = getCardanoCliValue(command, '')
     return int(feeString.split(' ')[0])
     
 
-def getDraftTX(txIn, returnAddr, recipientList, ttlSlot):
-    print('Creating tx.tmp...')
+def getDraftTX(txInList, returnAddr, recipientList, ttlSlot):
+    print('Creating tx.tmp...') 
     command = f'cardano-cli transaction build-raw \
-                --fee 0 \
-                --tx-in {txIn} '
+                --fee 0 '
+    for txIn in txInList:
+        command += f'--tx-in {txIn} '
     for toAddr in recipientList:
         command += f'--tx-out {toAddr}+0+"0 {tokenPolicyID}" '
     command += f'--tx-out {returnAddr}+0+"0 {tokenPolicyID}" \
@@ -125,23 +134,25 @@ def getDraftTX(txIn, returnAddr, recipientList, ttlSlot):
     return getCardanoCliValue(command, '')
     
 
-def getRawTx(txIn, initLovelace, initToken, returnAddr, recipientList, ttlSlot, fee, adaAmount, tokenAmount):
+def getRawTx(txInList, initLovelace, initToken, returnAddr, recipientList, ttlSlot, fee, adaAmount, tokenAmount, isConsolidation):
     print('Creating tx.raw...')
     adaToReturn = initLovelace - fee - adaAmount*len(recipientList)
     tokensToReturn = initToken - tokenAmount*len(recipientList)
     print('adaToReturn: ', adaToReturn)
     print('tokensToReturn: ', tokensToReturn)
     command = f'cardano-cli transaction build-raw \
-                --fee {fee} \
-                --tx-in {txIn} '
+                --fee {fee} '
+    for txIn in txInList:
+        command += f'--tx-in {txIn} '
     for toAddr in recipientList:
         command += f'--tx-out {toAddr}+{adaAmount}+"{tokenAmount} {tokenPolicyID}" ' 
-    command += f'--tx-out {returnAddr}+{adaToReturn}+"{tokensToReturn} {tokenPolicyID}" \
-                 --invalid-hereafter {ttlSlot} \
+    if not isConsolidation:
+        command += f'--tx-out {returnAddr}+{adaToReturn}+"{tokensToReturn} {tokenPolicyID}" '
+    command += f'--invalid-hereafter {ttlSlot} \
                  --out-file tx.raw'   
-    getCardanoCliValue(command, '')
+    getCardanoCliValue(command, '')   
 
-    
+
 def signTx():
     print('Signing Transaction...')
     command = f'cardano-cli transaction sign \
@@ -155,28 +166,51 @@ def signTx():
 def submitSignedTx():
     print('Submitting Transaction...')
     command = 'cardano-cli transaction submit --tx-file tx.signed --mainnet'
-    getCardanoCliValue(command, '')
+    return getCardanoCliValue(command, '')
 
 
 def sendTokenToAddr(txIn, initLovelace, initToken, fromAddr, recipientList, adaAmount, tokenAmount):
     ttlSlot = getCurrentSlot() + 2000
     print('TTL Slot:', ttlSlot)
-    getDraftTX(txIn, fromAddr, recipientList, ttlSlot)
-    fee = getMinFee(len(recipientList))
+    getDraftTX([txIn], fromAddr, recipientList, ttlSlot)
+    fee = getMinFee(1, len(recipientList))
     print ('Min fee:', fee)
-    getRawTx(txIn, initLovelace, initToken, fromAddr, recipientList, ttlSlot, fee, adaAmount, tokenAmount)
+    getRawTx([txIn], initLovelace, initToken, fromAddr, recipientList, ttlSlot, fee, adaAmount, tokenAmount, False)
     signTx()
-    submitSignedTx()
+    return submitSignedTx()
     
+    
+
+def consolidateTxHashes(txInList, initLovelace, initToken, fromAddr):
+    ttlSlot = getCurrentSlot() + 2000
+    print('TTL Slot:', ttlSlot)
+    getDraftTX(txInList, fromAddr, [fromAddr], ttlSlot)
+    fee = getMinFee(len(txInList), 1)
+    print ('Min fee:', fee)
+    getRawTx(txInList, initLovelace, initToken, fromAddr, [fromAddr], ttlSlot, fee, initLovelace-fee, initToken, True)
+    signTx()
+    return submitSignedTx()
+
 
 def main():
     with open(myPaymentAddrFile) as f:
         paymentAddr = f.read()
-    getProtocolJson()
-    recipientList = []
+    getProtocolJson() # Checks if it already exists, if not gets a new copy
+    # List of addresses you want to send to
+    recipientList = [
+                        'addr1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+                        'addr1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+                        'addr1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+                        'addr1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+                        'addr1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+                        'addr1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+                    ] 
+
+    # Convert staking address list to sending address list
     for stakeAddr in stakeAddressesOfRecipients:
         requestString = url + 'accounts/' + stakeAddr + '/addresses'
         header = {"project_id":blockFrostProjID}
+        # Get call from blockfrost.io
         getAddresses = requests.get(requestString, headers=header)
         if (getAddresses.status_code != 200):
             print('Error: Request failed: ', requestString)
@@ -185,11 +219,23 @@ def main():
         except:
             print('Error: Request return not in JSON format')
             return(-1)
+        # Use first address from the returned list 
         delegatorAddr = addressJson[0]['address']
+        print(delegatorAddr)
         recipientList.append(delegatorAddr)
 
-    utxos = getAddrUTxOs(paymentAddr)
-    myTxIn, myInitLovelace, myInitToken = getTxHashWithToken(utxos, tokenPolicyID)
+    # Get your payment address TxHashes
+    utxos = getAddrUTxOs(paymentAddr) 
+
+    # Get your TxHash which contains the tokens with PolicyID, and your ADA and token amount
+    myTxIn, myInitLovelace, myInitToken, myTxInList = getTxHashWithToken(utxos, tokenPolicyID)
+    # If necessary consolidate all your TxHashes to one
+    if len(myTxInList) > 1:
+        result = consolidateTxHashes(myTxInList, myInitLovelace, myInitToken, paymentAddr)
+        print('Please wait until the transaction is complete, and run the script again.')
+        exit (0)
+
+    # Error checks
     if (myTxIn == ''):
         print ('Error: No token found in sender Address.')
         return -1
@@ -200,11 +246,15 @@ def main():
         print ('Error: No token balance found in sender Address.')
         return -1
     print ('myTxIn: ', myTxIn)
-    print ('myInitLovelace', myInitLovelace)
-    print ('myInitToken', myInitToken)
+    print ('myInitLovelace:', myInitLovelace)
+    print ('myInitToken:', myInitToken)
 
-    sendTokenToAddr(myTxIn, myInitLovelace, myInitToken, paymentAddr, recipientList, minADAToSendWithToken, noOfTokensToSend)
-
+    # Send noOfTokens to all your recipients with one Tx
+    result = sendTokenToAddr(myTxIn, myInitLovelace, myInitToken, paymentAddr, recipientList, minADAToSendWithToken, noOfTokensToSend) 
+    if result == -1:
+        return result
+    
+    # Print the current time to estimate how long it will take
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print('Transaction submitted at ' + current_time + '.')
