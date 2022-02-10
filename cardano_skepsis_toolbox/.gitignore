@@ -1,0 +1,7 @@
+logs
+venv
+my_config.json
+protocol.json
+tx.raw
+tx.signed
+tx.tmp
