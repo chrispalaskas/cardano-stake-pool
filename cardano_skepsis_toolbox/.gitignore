@@ -1,6 +1,7 @@
 logs
 venv
-my_config.json
+__pycache__
+config_christos.json
 protocol.json
 tx.raw
 tx.signed
