@@ -9,3 +9,7 @@ Installation:
 4. pip install -r requirements.txt
 5. Edit config.json
 6. run with <<python3 FILE.py>>
+
+Testing:
+In a terminal with the virtual environment venv activated (Step 2 of installation):
+python -m unittest

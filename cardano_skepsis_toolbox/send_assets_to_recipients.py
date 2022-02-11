@@ -13,13 +13,15 @@ from datetime import datetime
 
 # List of addresses you want to send to
 RecipientList = [
-
+                    'addr1v86pqugsjsu3enxnxxl9ky8g6eefvddtzvyted4mv0pwuysfj0zhz',
+                    'addr1v86pqugsjsu3enxnxxl9ky8g6eefvddtzvyted4mv0pwuysfj0zhz',
+                    'addr1v86pqugsjsu3enxnxxl9ky8g6eefvddtzvyted4mv0pwuysfj0zhz'
                 ] 
                 
 # List of stake addresses you want to send to                
 StakeAddressesOfRecipients = \
     [        
-        
+        'stake1u9unh8dunl2mj2pwdqm53k7xw4l7p9l2l4egywrdyqwhvnqyd7sx8'
     ]
 
 
