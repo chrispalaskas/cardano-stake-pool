@@ -20,10 +20,10 @@ class Recipient:
 
 
 def getCardanoCliValue(command, key):
-    with Popen(command, stdout=PIPE, stderr=PIPE, shell=True) as process:       
-        stdout, stderr = process.communicate()    
+    with Popen(command, stdout=PIPE, stderr=PIPE, shell=True) as process:
+        stdout, stderr = process.communicate()
         stdout = stdout.decode("utf-8")
-        stderr = stderr.decode("utf-8")        
+        stderr = stderr.decode("utf-8")
         print(stdout)
         print(stderr)
         if not stderr == '':
@@ -52,7 +52,7 @@ def getAddrUTxOs(addr):
 def getTxInWithLargestTokenAmount(utxosJson, tokenPolicyID):
     tokenMax = 0
     maxTokenTxHash = str
-    for key in utxosJson.keys():    
+    for key in utxosJson.keys():
         for key2 in utxosJson[key]['value'].keys():
             if key2 == 'lovelace':
                 continue
@@ -68,7 +68,7 @@ def getTxInWithLargestTokenAmount(utxosJson, tokenPolicyID):
 def getTokenListFromTxHash(utxosJson):
     print('Getting list of tokens and ADA with amounts...')
     tokensDict = {}
-    for key in utxosJson.keys():    
+    for key in utxosJson.keys():
         for key2 in utxosJson[key]['value'].keys():
             if key2 == 'lovelace':
                 if 'ADA' in tokensDict.keys():
@@ -126,7 +126,7 @@ def getDraftTX(txInList, returnAddr, recipientList, ttlSlot):
     for recipient in recipientList:
         command += f'--tx-out {recipient.address}+0 '
     command += f'--tx-out {returnAddr}+0 \
-                 --invalid-hereafter {ttlSlot}  \
+                 --invalid-hereafter {ttlSlot} \
                  --out-file tx.tmp'
     getCardanoCliValue(command, '')
     return
@@ -159,8 +159,8 @@ def getRawTx(txInList, initLovelace, initToken, returnAddr, recipientList, ttlSl
         command += f'--tx-out {recipient.address}+{recipient.lovelace_amount_to_send}+"{recipient.token_amount_to_send} {tokenPolicyId}" ' 
     command += f'--tx-out {returnAddr}+{lovelace_to_return}+"{tokens_to_return} {tokenPolicyId}" '
     command += f'--invalid-hereafter {ttlSlot} \
-                 --out-file tx.raw'   
-    getCardanoCliValue(command, '')   
+                 --out-file tx.raw'
+    getCardanoCliValue(command, '')
 
 
 def signTx(myPaymentAddrSignKeyFile):
@@ -169,7 +169,7 @@ def signTx(myPaymentAddrSignKeyFile):
                     --signing-key-file {myPaymentAddrSignKeyFile} \
                     --tx-body-file tx.raw \
                     --out-file tx.signed \
-                    --mainnet'    
+                    --mainnet'
     getCardanoCliValue(command, '')
 
 

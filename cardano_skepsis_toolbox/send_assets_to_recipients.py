@@ -17,18 +17,23 @@ RecipientList = [
                     'addr1v86pqugsjsu3enxnxxl9ky8g6eefvddtzvyted4mv0pwuysfj0zhz',
                     'addr1v86pqugsjsu3enxnxxl9ky8g6eefvddtzvyted4mv0pwuysfj0zhz'
                 ] 
-                
-# List of stake addresses you want to send to                
+
+# List of stake addresses you want to send to
 StakeAddressesOfRecipients = \
     [        
         'stake1u9unh8dunl2mj2pwdqm53k7xw4l7p9l2l4egywrdyqwhvnqyd7sx8'
     ]
 
 
-def main(finRecipientList, myPaymentAddrFile, tokenPolicyID, sent_tokens_log_file, minFee):
+def main(finRecipientObjList,
+        myPaymentAddrFile,
+        myPaymentAddrSignKeyFile,
+        tokenPolicyID,
+        sentTokensLogFile,
+        minFee):
     with open(myPaymentAddrFile) as file:
         paymentAddr = file.read()
-    cli.getProtocolJson() # Checks if it already exists, if not gets a new copy  
+    cli.getProtocolJson() # Checks if it already exists, if not gets a new copy
 
     # Get your payment address TxHashes
     utxos = cli.getAddrUTxOs(paymentAddr) 
@@ -45,29 +50,29 @@ def main(finRecipientList, myPaymentAddrFile, tokenPolicyID, sent_tokens_log_fil
     if tokenPolicyID in tokensDict.keys():
         myInitToken = tokensDict[tokenPolicyID]
     else:
-        print('Error: Could not find token with Policy ID ', tokenPolicyID)    
+        print('Error: Could not find token with Policy ID ', tokenPolicyID)
         return False
     print ('myInitLovelace:', myInitLovelace)
     print ('myInitToken:', myInitToken)
 
     # Send noOfTokens to all your recipients with one Tx
     result = cli.sendTokenToAddr(myPaymentAddrSignKeyFile, allTxInList, myInitLovelace, myInitToken, paymentAddr,
-                                 finRecipientList, tokenPolicyID, minFee) 
+                                 finRecipientObjList, tokenPolicyID, minFee) 
     if result == -1:
         print ('Error: Tokens could not be sent.')
         return False
-    
+
     if cli.getCnodeJournal(paymentAddr, tokenPolicyID, myTxHash):
         # Store sent transactions on log file
         now = datetime.now()
-        current_time = now.strftime("%Y-%m-%d %H:%M:%S")  
+        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
         latest_tx = {current_time:{}}
-        for recipient in finRecipientList:
+        for recipient in finRecipientObjList:
             latest_tx[current_time][recipient.address] = {}
             latest_tx[current_time][recipient.address]['ADA Received'] = '%.3f'%(recipient.lovelace_amount_received/1000000)
             latest_tx[current_time][recipient.address]['ADA Sent'] = '%.3f'%(recipient.lovelace_amount_to_send/1000000)
             latest_tx[current_time][recipient.address]['Tokens Sent'] = recipient.token_amount_to_send
-        helper.appendLogJson(sent_tokens_log_file, latest_tx)
+        helper.appendLogJson(sentTokensLogFile, latest_tx)
         print('Log appended')
         return True
     else:
@@ -76,12 +81,20 @@ def main(finRecipientList, myPaymentAddrFile, tokenPolicyID, sent_tokens_log_fil
 
 if __name__ == '__main__':
     print('Send one NFT to each delegator in the list.')
-    configFile = '/home/christo/Documents/cardano-stake-pool/cardano_skepsis_toolbox/config.json'    
-    myPaymentAddrFile, myPaymentAddrSignKeyFile, tokenPolicyID, \
-    sentTokensLogFile, noOfTokensToSend, minADAToSendWithToken, \
-    finRecipientObjList, minFee = helper.parseConfigSendAssets(configFile, StakeAddressesOfRecipients, RecipientList)
+    configFile = './config.json'
+    myPaymentAddrFile, \
+    myPaymentAddrSignKeyFile, \
+    tokenPolicyID, \
+    sentTokensLogFile, \
+    minFee, \
+    finRecipientObjList = helper.parseConfigSendAssets(configFile, StakeAddressesOfRecipients, RecipientList)
 
     if len(finRecipientObjList) != 0:
-        main(finRecipientObjList, myPaymentAddrFile, tokenPolicyID, sentTokensLogFile, minFee)
+        main(finRecipientObjList,
+             myPaymentAddrFile,
+             myPaymentAddrSignKeyFile,
+             tokenPolicyID,
+             sentTokensLogFile,
+             minFee)
     else:
         print('Empty list of recipients received.')

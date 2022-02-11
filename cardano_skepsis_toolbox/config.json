@@ -1,12 +1,14 @@
 {
     "myPaymentAddrFile": "PATH_TO/payment.addr",
     "myPaymentAddrSignKeyFile": "PATH_TO/payment.skey",
+    "tokenPolicyID": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXX",
+    "tokenPriceLovelace": 3000000,
+    "minADAToSendWithToken": 1444443,    
+    "noOfTokensToSend": 1,
+    "minFee": 180000,
     "incomingTxhashLogFile": "PATH_TO/incoming_txhash_log.json",
     "sentTxhashLogFile": "PATH_TO/sent_txhash_log.json",
     "sentTokensLogFile": "PATH_TO/sent_tokens_log_file.json",
-    "tokenPolicyID": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXX",
-    "noOfTokensToSend": 1,
-    "minADAToSendWithToken": 1444443,    
-    "tokenPriceLovelace": 3000000,
-    "minFee": 180000    
+    "blockFrostURL": "https://cardano-mainnet.blockfrost.io/api/v0/",
+    "blockFrostProjID": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 }
