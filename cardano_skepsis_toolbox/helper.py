@@ -6,7 +6,7 @@ import cardano_cli_helper as cli
 
 
 BlockfrostURL = 'https://cardano-mainnet.blockfrost.io/api/v0/'
-BlockFrostProjID = 'mainnetvDjTcvrKjuAzCEII8JZUbebidpMCdLOq'
+BlockFrostProjID = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
 def getBlockfrostAPIData(requestString: str):
     header = {"project_id":BlockFrostProjID}
